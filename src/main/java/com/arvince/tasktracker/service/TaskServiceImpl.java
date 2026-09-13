@@ -48,14 +48,18 @@ public class TaskServiceImpl implements TaskService {
 	public TaskResponse updateTask(Long id, TaskRequest request) {
 		Task task = findTaskOrThrow(id);
 		TaskMapper.applyFullUpdate(task, request);
-		return TaskMapper.toResponse(task);
+		// Flush so @PreUpdate runs now and the response reflects the real updatedAt,
+		// rather than the stale in-memory value (the hook only fires at flush time).
+		Task saved = taskRepository.saveAndFlush(task);
+		return TaskMapper.toResponse(saved);
 	}
 
 	@Override
 	public TaskResponse patchTask(Long id, TaskPatchRequest request) {
 		Task task = findTaskOrThrow(id);
 		TaskMapper.applyPatch(task, request);
-		return TaskMapper.toResponse(task);
+		Task saved = taskRepository.saveAndFlush(task);
+		return TaskMapper.toResponse(saved);
 	}
 
 	@Override

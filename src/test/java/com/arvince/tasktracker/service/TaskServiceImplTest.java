@@ -87,6 +87,7 @@ class TaskServiceImplTest {
 	@Test
 	void updateTask_replacesFields() {
 		when(taskRepository.findById(1L)).thenReturn(Optional.of(existingTask));
+		when(taskRepository.saveAndFlush(any(Task.class))).thenAnswer(invocation -> invocation.getArgument(0));
 		TaskRequest request = new TaskRequest("Updated title", "Updated description", TaskStatus.IN_PROGRESS, LocalDate.of(2026, 2, 1));
 
 		TaskResponse response = taskService.updateTask(1L, request);
@@ -100,6 +101,7 @@ class TaskServiceImplTest {
 	@Test
 	void patchTask_appliesOnlyProvidedFields() {
 		when(taskRepository.findById(1L)).thenReturn(Optional.of(existingTask));
+		when(taskRepository.saveAndFlush(any(Task.class))).thenAnswer(invocation -> invocation.getArgument(0));
 		TaskPatchRequest patch = new TaskPatchRequest(null, null, TaskStatus.DONE, null);
 
 		TaskResponse response = taskService.patchTask(1L, patch);
